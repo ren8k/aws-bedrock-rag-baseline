@@ -58,7 +58,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
 ### Knowledge Bases for Amazon Bedrock の構築（スキップ可能）
 
-[`./notebook/0_create_ingest_documents_test_kb.ipynb`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/notebook/0_create_ingest_documents_test_kb.ipynb)を全て実行し，Knowledge Bases for Amazon Bedrock を構築する．本ノートブックでは，以下を実行する．
+[`./notebook/0_create_ingest_documents_test_kb.ipynb`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/notebook/0_create_ingest_documents_test_kb.ipynb)を全て実行し，Knowledge Bases for Amazon Bedrock を構築する．本ノートブックでは，以下を実行する．（既存の Knowledge Base を利用する場合はスキップ可能．）
 
 - Amazon S3 からデータにアクセスし、OpenSearch Serverless に embeddings を保存するためのポリシーおよび実行ロールを作成
 - OpenSearch Serverless の空のインデックスを作成
@@ -67,6 +67,8 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 - Knowledge Bases を作成
 - start_ingestion_job API を利用し，Knowledge Bases にデータをインポート
   - S3 からデータを取り込み，チャンク分割し，Amazon Titan Embeddings モデルにより embedding に変換し，これらの embedding を AOSS に保存する
+
+なお，上記のノートブックに関しては AWS の公式リポジトリ[^2]のノートブックを流用させていただいております，作成者の方には感謝申し上げます．
 
 ### RAG による質問応答の実行
 
@@ -160,7 +162,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 ## TODO
 
 - 引用部分の提示
-  - qiita の記事[^2]などを参考に
+  - qiita の記事[^3]などを参考に
 - LangChain でも実装してみたい
   - openai api との切り替えなども楽そう
 - Knowlwdge base の IaC 化
@@ -168,10 +170,11 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 - アプリケーション化
 - MLflow などと組み合わせた実験管理
 - Advanced RAG の利用
-  - 公式ブログ[^3]を参考に Kendra などを利用してみる
+  - 公式ブログ[^4]を参考に Kendra などを利用してみる
 
 ## Reference
 
 [^1]: [Amazon Bedrock のナレッジベースでサポートされているリージョンとモデル](https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/knowledge-base-supported.html)
-[^2]: [Amazon Bedrock に Cohere Command R と Command R+ が来たよ！RAG がすげーよ！](https://qiita.com/moritalous/items/16797ea9d82295f40b5e)
-[^3]: [Amazon Kendra と Amazon Bedrock で構成した RAG システムに対する Advanced RAG 手法の精度寄与検証](https://aws.amazon.com/jp/blogs/news/verifying-the-accuracy-contribution-of-advanced-rag-methods-on-rag-systems-built-with-amazon-kendra-and-amazon-bedrock/)
+[^2]: [aws-samples/amazon-bedrock-workshop](https://github.com/aws-samples/amazon-bedrock-workshop/blob/main/02_KnowledgeBases_and_RAG/0_create_ingest_documents_test_kb.ipynb)
+[^3]: [Amazon Bedrock に Cohere Command R と Command R+ が来たよ！RAG がすげーよ！](https://qiita.com/moritalous/items/16797ea9d82295f40b5e)
+[^4]: [Amazon Kendra と Amazon Bedrock で構成した RAG システムに対する Advanced RAG 手法の精度寄与検証](https://aws.amazon.com/jp/blogs/news/verifying-the-accuracy-contribution-of-advanced-rag-methods-on-rag-systems-built-with-amazon-kendra-and-amazon-bedrock/)

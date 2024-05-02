@@ -114,7 +114,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
-- LLM の設定（`bedrock_runtime.invoke_model`の引数等）を[`./config/llm](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm)ディレクトリ内の yaml ファイルに記載する．以下に，Claude3 Opus を利用する場合の例を解説する．
+- LLM の設定（`bedrock_runtime.invoke_model`の引数等）を[`./config/llm`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm)ディレクトリ内の yaml ファイルに記載する．以下に，Claude3 Opus を利用する場合の例を解説する．
   - 設定ファイルとしては[`./config/llm/claude-3_cofig.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm/claude-3_cofig.yaml)を利用する．
   - 引数の他，`stream` 機能を利用するかどうか，`model_id` を記載する．
   - `messages`には{prompt}を含むように記載する

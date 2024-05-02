@@ -23,7 +23,7 @@
   - [RAG による質問応答の実行](#rag-による質問応答の実行)
   - [CleanUp（スキップ可能）](#cleanupスキップ可能)
 - [ToDo](#todo)
-- [Reference](#reference)
+- [References](#references)
 
 ## 背景
 
@@ -49,7 +49,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 - `requirements.txt` に記載のライブラリがインストールされている．
   - `pip install -r requirements.txt` でインストール可能．
 - `適切な認証情報の設定・ロールの設定がなされている．
-  - 不安なら Cloud9 上で実行すれば良い．
+  - 設定が面倒な場合，Cloud9 上で実行しても良い．
 
 ## 手順
 
@@ -71,14 +71,13 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 - start_ingestion_job API を利用し，Knowledge Base にデータをインポート
   - S3 からデータを取り込み，チャンク分割し，Amazon Titan Embeddings モデルにより embedding に変換し，これらの embedding を AOSS に保存する
 
-なお，上記のノートブックに関しては AWS の公式リポジトリ[^2]のノートブックを流用させていただいております．作成者の方には感謝申し上げます．
+なお，上記のノートブックに関しては AWS の公式リポジトリ[^2]のノートブックをほぼ流用させていただいております．作成者の方には感謝申し上げます．
 
 ### RAG による質問応答の実行
 
-検索したい内容やプロンプトの雛形を yaml ファイルに定義しておき，python スクリプトを実行することで，RAG による質問応答を行う．
+検索したい内容やプロンプトの雛形を yaml ファイルに定義しておき，python スクリプト（[`main.py`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src/main.py)）を実行することで，RAG による質問応答を行う．
 
-- 検索したい事項を[`./config/query/query.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/query/query.yaml)に記載する
-
+- 検索したい事項を[`./config/query/query.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/query/query.yaml)に記載する．
   <details>
   <summary>query.yamlの中身（例）</summary>
   <br/>
@@ -90,10 +89,9 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
   </details>
   <br/>
 
-- プロンプトテンプレートを[`./config/prompt_template/prompt_template.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/prompt_template/prompt_template.yaml)に記載する
+- プロンプトテンプレートを[`./config/prompt_template/prompt_template.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/prompt_template/prompt_template.yaml)に記載する．
 
-  - 検索したい事項を{query}に，Knowledge Base から Retrieve した内容が{contexts}に入るように実装している
-
+  - 検索したい事項が`{query}`に，Knowledge Base から Retrieve した内容が`{contexts}`に入るように実装している．
   <details>
   <summary>prompt_template.yamlの中身（例）</summary>
   <br/>
@@ -116,47 +114,75 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
     Assistant:
   ```
 
-  </details>
-  <br/>
+    </details>
+    <br/>
 
-- （Cloud3 を利用する場合，）LLM の設定（`bedrock_runtime.invoke_model`の引数等）を[`./config/llm/claude-3_cofig.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm/claude-3_cofig.yaml)に記載する
+- LLM の設定（`bedrock_runtime.invoke_model`の引数等）を[`./config/llm](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm)ディレクトリ内の yaml ファイルに記載する．以下に，Claude3 Opus を利用する場合の例を解説する．
 
-  - 引数の他，stream 機能を利用するかどうか，model_id を記載する
-  - キー`messages`には{prompt}を含むように記載する
+  - 設定ファイルとしては[`./config/llm/claude-3_cofig.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm/claude-3_cofig.yaml)を利用する．
+  - 引数の他，`stream` 機能を利用するかどうか，`model_id` を記載する．
+  - `messages`には{prompt}を含むように記載する
 
-  <details>
-  <summary>claude-3_cofig.yamlの中身（例）</summary>
-  <br/>
+    - 利用する LLM により引数の要素が異なるため，適宜公式ドキュメント[^3]を参照すること．
+    - 例えば，Command R+の場合は，Claude3 とは異なり，プロンプトを`message`に記載する．（`messages`ではない）
+    <details>
+    <summary>claude-3_cofig.yamlの中身（例）</summary>
+    <br/>
 
-  ```yaml
-  "anthropic_version": "bedrock-2023-05-31"
-  "max_tokens": 1000
-  "temperature": 0
-  "system": "Respond only in Japanese"
-  "messages":
-    [{ "role": "user", "content": [{ "type": "text", "text": "{prompt}" }] }]
-  "stop_sequences": ["</output>"]
-  "stream": false
-  "model_id": "anthropic.claude-3-opus-20240229-v1:0"
-  ```
+    ```yaml
+    "anthropic_version": "bedrock-2023-05-31"
+    "max_tokens": 1000
+    "temperature": 0
+    "system": "Respond only in Japanese"
+    "messages":
+      [{ "role": "user", "content": [{ "type": "text", "text": "{prompt}" }] }]
+    "stop_sequences": ["</output>"]
 
-  </details>
-  <br/>
+    "stream": false
+    "model_id": "anthropic.claude-3-opus-20240229-v1:0"
+    ```
+
+    </details>
+    <br/>
+
+    <details>
+    <summary>command-r-plus_config.yamlの中身（例）</summary>
+    <br/>
+
+    ```yaml
+    "max_tokens": 1000
+    "temperature": 0
+    "message": "{prompt}"
+    "chat_history":
+      [
+        { "role": "USER", "message": "Respond only in Japanese" },
+        {
+          "role": "CHATBOT",
+          "message": "Sure. What would you like to talk about?",
+        },
+      ]
+    "stop_sequences": ["</output>"]
+
+    "stream": true
+    "model_id": "cohere.command-r-plus-v1:0"
+    ```
+
+    </details>
+    <br/>
 
 - 利用する Knowledge Base の ID を確認する
-
   <details>
   <summary>Knowledge Base の IDの確認（例）</summary>
   <br/>
 
-  <img src="./assets/kb_id.png" width="500">
+  <img src="./assets/kb_id.png" width="800">
 
   </details>
   <br/>
 
-- `./src`ディレクトリに移動し，`python main.py --kb-id <Knowledge Base の ID>`を実行する
+- [`./src`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src)ディレクトリに移動し，`python main.py --kb-id <Knowledge Base の ID>`を実行する
   - LLM，Retriever, PromptConfig というクラスを定義している
-  - 利用する LLM の設定ファイルは，`main.py`の 35, 36 行目で指定している
+  - 利用する LLM の設定ファイルは，[`main.py`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src/main.py)の 35, 36 行目で指定している
 
 ### CleanUp（スキップ可能）
 
@@ -164,23 +190,24 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
 ## ToDo
 
-- Command R+ 特有の検索クエリーの生成および Retrieve した結果を引数`documents`に辞書形式で渡した場合の精度検証
-  - AWS 公式ドキュメント[^3]によると，辞書内の文字列の合計単語数は 300 words 未満に抑えることを推奨しており，単に Retrieve した結果をそのまま引数`documents`に格納すると性能低下する可能性あり？
+- Command R+ 特有の検索クエリの生成および Retrieve した結果を引数`documents`に辞書形式で渡した場合の精度検証
+  - AWS 公式ドキュメント[^4]によると，辞書内の文字列の合計単語数は 300 words 未満に抑えることを推奨しており，単に Retrieve した結果をそのまま引数`documents`に格納すると性能低下する可能性あり？
 - 引用部分の提示
-  - qiita の記事[^4]などを参考に
+  - qiita の記事[^5]などを参考にすると良いかも
 - LangChain でも実装してみたい
   - OpenAI API との切り替えなども楽そう
 - Knowlwdge base の IaC 化
   - CDK or CloudFormation
 - アプリケーション化
 - MLflow などと組み合わせた実験管理
-- Advanced RAG の利用
-  - 公式ブログ[^5]を参考に Kendra などを利用してみる
+- Advanced RAG への拡張
+  - 公式ブログ[^6]を参考に Kendra などを利用してみる
 
-## Reference
+## References
 
 [^1]: [Amazon Bedrock のナレッジベースでサポートされているリージョンとモデル](https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/knowledge-base-supported.html)
 [^2]: [aws-samples/amazon-bedrock-workshop](https://github.com/aws-samples/amazon-bedrock-workshop)
-[^3]: [Cohere Command R および Command R+ モデル](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command-r-plus.html)
-[^4]: [Amazon Bedrock に Cohere Command R と Command R+ が来たよ！RAG がすげーよ！](https://qiita.com/moritalous/items/16797ea9d82295f40b5e)
-[^5]: [Amazon Kendra と Amazon Bedrock で構成した RAG システムに対する Advanced RAG 手法の精度寄与検証](https://aws.amazon.com/jp/blogs/news/verifying-the-accuracy-contribution-of-advanced-rag-methods-on-rag-systems-built-with-amazon-kendra-and-amazon-bedrock/)
+[^3]: [Anthropic Claude Messages API](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html)
+[^4]: [Cohere Command R および Command R+ モデル](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command-r-plus.html)
+[^5]: [Amazon Bedrock に Cohere Command R と Command R+ が来たよ！RAG がすげーよ！](https://qiita.com/moritalous/items/16797ea9d82295f40b5e)
+[^6]: [Amazon Kendra と Amazon Bedrock で構成した RAG システムに対する Advanced RAG 手法の精度寄与検証](https://aws.amazon.com/jp/blogs/news/verifying-the-accuracy-contribution-of-advanced-rag-methods-on-rag-systems-built-with-amazon-kendra-and-amazon-bedrock/)

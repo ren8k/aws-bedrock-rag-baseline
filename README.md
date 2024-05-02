@@ -88,9 +88,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
-
 - プロンプトテンプレートを[`./config/prompt_template/prompt_template.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/prompt_template/prompt_template.yaml)に記載する．
-
   - 検索したい事項が`{query}`に，Knowledge Base から Retrieve した内容が`{contexts}`に入るように実装している．
   <details>
   <summary>prompt_template.yamlの中身（例）</summary>
@@ -114,62 +112,57 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
     Assistant:
   ```
 
-    </details>
-    <br/>
-
+  </details>
+  <br/>
 - LLM の設定（`bedrock_runtime.invoke_model`の引数等）を[`./config/llm](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm)ディレクトリ内の yaml ファイルに記載する．以下に，Claude3 Opus を利用する場合の例を解説する．
-
   - 設定ファイルとしては[`./config/llm/claude-3_cofig.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm/claude-3_cofig.yaml)を利用する．
   - 引数の他，`stream` 機能を利用するかどうか，`model_id` を記載する．
   - `messages`には{prompt}を含むように記載する
-
     - 利用する LLM により引数の要素が異なるため，適宜公式ドキュメント[^3]を参照すること．
     - 例えば，Command R+の場合は，Claude3 とは異なり，プロンプトを`message`に記載する．（`messages`ではない）
-    <details>
-    <summary>claude-3_cofig.yamlの中身（例）</summary>
-    <br/>
+  <details>
+  <summary>claude-3_cofig.yamlの中身（例）</summary>
+  <br/>
 
-    ```yaml
-    "anthropic_version": "bedrock-2023-05-31"
-    "max_tokens": 1000
-    "temperature": 0
-    "system": "Respond only in Japanese"
-    "messages":
-      [{ "role": "user", "content": [{ "type": "text", "text": "{prompt}" }] }]
-    "stop_sequences": ["</output>"]
+  ```yaml
+  "anthropic_version": "bedrock-2023-05-31"
+  "max_tokens": 1000
+  "temperature": 0
+  "system": "Respond only in Japanese"
+  "messages":
+    [{ "role": "user", "content": [{ "type": "text", "text": "{prompt}" }] }]
+  "stop_sequences": ["</output>"]
 
-    "stream": false
-    "model_id": "anthropic.claude-3-opus-20240229-v1:0"
-    ```
+  "stream": false
+  "model_id": "anthropic.claude-3-opus-20240229-v1:0"
+  ```
 
-    </details>
-    <br/>
+  </details>
+  <br/>
+  <details>
+  <summary>command-r-plus_config.yamlの中身（例）</summary>
+  <br/>
 
-    <details>
-    <summary>command-r-plus_config.yamlの中身（例）</summary>
-    <br/>
+  ```yaml
+  "max_tokens": 1000
+  "temperature": 0
+  "message": "{prompt}"
+  "chat_history":
+    [
+      { "role": "USER", "message": "Respond only in Japanese" },
+      {
+        "role": "CHATBOT",
+        "message": "Sure. What would you like to talk about?",
+      },
+    ]
+  "stop_sequences": ["</output>"]
 
-    ```yaml
-    "max_tokens": 1000
-    "temperature": 0
-    "message": "{prompt}"
-    "chat_history":
-      [
-        { "role": "USER", "message": "Respond only in Japanese" },
-        {
-          "role": "CHATBOT",
-          "message": "Sure. What would you like to talk about?",
-        },
-      ]
-    "stop_sequences": ["</output>"]
+  "stream": true
+  "model_id": "cohere.command-r-plus-v1:0"
+  ```
 
-    "stream": true
-    "model_id": "cohere.command-r-plus-v1:0"
-    ```
-
-    </details>
-    <br/>
-
+  </details>
+  <br/>
 - 利用する Knowledge Base の ID を確認する
   <details>
   <summary>Knowledge Base の IDの確認（例）</summary>
@@ -179,7 +172,6 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
-
 - [`./src`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src)ディレクトリに移動し，`python main.py --kb-id <Knowledge Base の ID>`を実行する
   - LLM，Retriever, PromptConfig というクラスを定義している
   - 利用する LLM の設定ファイルは，[`main.py`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src/main.py)の 35, 36 行目で指定している

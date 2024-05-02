@@ -1,4 +1,4 @@
-[AWS 公式のサンプル本リポジトリ](https://github.com/aws-samples/amazon-bedrock-workshop/tree/main/02_KnowledgeBases_and_RAG)をほぼ流用させていただいております．本家リポジトリを是非御覧ください．
+[AWS 公式のサンプルリポジトリ](https://github.com/aws-samples/amazon-bedrock-workshop/tree/main/02_KnowledgeBases_and_RAG)をほぼ流用させていただいております．本家リポジトリを是非御覧ください．
 
 # Amazon Bedrock Knowledge Base - Samples for building RAG workflows
 

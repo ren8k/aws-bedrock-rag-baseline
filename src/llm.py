@@ -39,10 +39,10 @@ class LLM:
             body=body, modelId=model_id
         )
         for event in response.get("body"):
-            self._get_generated_stream_text(event, model_id)
+            self._show_generated_stream_text(event, model_id)
 
     # TODO: split method for each model.
-    def _get_generated_stream_text(self, event: dict, model_id: str) -> None:
+    def _show_generated_stream_text(self, event: dict, model_id: str) -> None:
         if "claude-3" in model_id:
             chunk = json.loads(event["chunk"]["bytes"])
             if chunk["type"] == "content_block_delta":

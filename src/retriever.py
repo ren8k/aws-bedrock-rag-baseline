@@ -21,7 +21,7 @@ class Retriever:
             retrievalConfiguration={
                 "vectorSearchConfiguration": {
                     "numberOfResults": no_of_results,
-                    "overrideSearchType": "HYBRID",  # optional
+                    # "overrideSearchType": "HYBRID",  # optional
                 }
             },
         )

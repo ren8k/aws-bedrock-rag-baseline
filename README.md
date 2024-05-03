@@ -22,7 +22,7 @@
   - [Knowledge Base for Amazon Bedrock の構築（スキップ可能）](#knowledge-base-for-amazon-bedrock-の構築スキップ可能)
   - [RAG による質問応答の実行](#rag-による質問応答の実行)
   - [CleanUp（スキップ可能）](#cleanupスキップ可能)
-- [ToDo](#todo)
+- [Next Step](#next-step)
 - [References](#references)
 
 ## 背景
@@ -88,7 +88,9 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
+
 - プロンプトテンプレートを[`./config/prompt_template/prompt_template.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/prompt_template/prompt_template.yaml)に記載する．
+
   - 検索したい事項が`{query}`に，Knowledge Base から Retrieve した内容が`{contexts}`に入るように実装している．
   <details>
   <summary>prompt_template.yamlの中身（例）</summary>
@@ -114,15 +116,17 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
+
 - LLM の設定（`bedrock_runtime.invoke_model`の引数等）を[`./config/llm`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm)ディレクトリ内の yaml ファイルに記載する．以下に，Claude3 Opus を利用する場合の例を解説する．
+
   - 設定ファイルとしては[`./config/llm/claude-3_cofig.yaml`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/config/llm/claude-3_cofig.yaml)を利用する．
   - 引数の他，`stream` 機能を利用するかどうか，`model_id` を記載する．
   - `messages`には{prompt}を含むように記載する
     - 利用する LLM により引数の要素が異なるため，適宜公式ドキュメント[^3]を参照すること．
     - 例えば，Command R+の場合は，Claude3 とは異なり，プロンプトを`message`に記載する．（`messages`ではない）
-  <details>
-  <summary>claude-3_cofig.yamlの中身（例）</summary>
-  <br/>
+    <details>
+    <summary>claude-3_cofig.yamlの中身（例）</summary>
+    <br/>
 
   ```yaml
   "anthropic_version": "bedrock-2023-05-31"
@@ -163,6 +167,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
+
 - 利用する Knowledge Base の ID を確認する
   <details>
   <summary>Knowledge Base の IDの確認（例）</summary>
@@ -172,6 +177,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
   </details>
   <br/>
+
 - [`./src`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src)ディレクトリに移動し，`python main.py --kb-id <Knowledge Base の ID>`を実行する
   - LLM，Retriever, PromptConfig というクラスを定義している
   - 利用する LLM の設定ファイルは，[`main.py`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/src/main.py)の 35, 36 行目で指定している
@@ -180,8 +186,15 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 
 [`./notebook/0_create_ingest_documents_test_kb.ipynb`](https://github.com/ren8k/aws-bedrock-rag-baseline/blob/main/notebook/0_create_ingest_documents_test_kb.ipynb)の下部に`CleanUp`セクションがある．セクションのコメントアウトを外し実行することで，ノートブック上部で作成したリソースを全て削除する．
 
-## ToDo
+## Next Step
 
+- Advanced RAG への拡張
+  - 公式ブログ[^6]を参考にすると良いかも
+- DB 格納前の工夫
+  - [セクション毎にチャンク分割するための工夫](https://qiita.com/Naoki_Ishihara/items/9f1b852917de19141847)が必要か？
+    - RAG の評価も参考になるかも
+  - 日本語ドキュメントの場合 NFKC 正規化しておくほうが良いか？
+  - 非同期処理は[本記事](https://qiita.com/ShotaOki/items/3198eb695e1c6aa8cdaa)が参考になるかも
 - Command R+ 特有の検索クエリの生成および Retrieve した結果を引数`documents`に辞書形式で渡した場合の精度検証
   - AWS 公式ドキュメント[^4]によると，辞書内の文字列の合計単語数は 300 words 未満に抑えることを推奨しており，単に Retrieve した結果をそのまま引数`documents`に格納すると性能低下する可能性あり？
 - 引用部分の提示
@@ -192,8 +205,6 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
   - CDK or CloudFormation
 - アプリケーション化
 - MLflow などと組み合わせた実験管理
-- Advanced RAG への拡張
-  - 公式ブログ[^6]を参考に Kendra などを利用してみる
 
 ## References
 

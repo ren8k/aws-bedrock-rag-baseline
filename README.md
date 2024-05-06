@@ -1,6 +1,6 @@
 # Knowledge Bases for Amazon Bedrock を利用した RAG のベースライン<!-- omit in toc -->
 
-本リポジトリでは，Knowledge Base(OpenSearch Serverless) および Bedrock を利用した RAG の Python 実装（ベースライン）を公開している．LLM，Retriever, PromptConfig というクラスを定義し，可能な限りシンプルに実装している．
+本リポジトリでは，Knowledge Base(OpenSearch Serverless) および Bedrock を利用した RAG の Python 実装（ベースライン）を公開している．LLM，Retriever，PromptConfig というクラスを定義し，可能な限りシンプルに実装している．
 
 ## TL;DR<!-- omit in toc -->
 
@@ -48,7 +48,7 @@ boto3 のみを利用してシンプルな RAG を実装する．また，Python
 - オレゴンリージョン（`us-west-2`）での実行を前提としている．
 - `requirements.txt` に記載のライブラリがインストールされている．
   - `pip install -r requirements.txt` でインストール可能．
-- `適切な認証情報の設定・ロールの設定がなされている．
+- 適切な認証情報の設定・ロールの設定がなされている．
   - 設定が面倒な場合，Cloud9 上で実行しても良い．
 
 ## 手順
